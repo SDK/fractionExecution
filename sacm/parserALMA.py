@@ -24,8 +24,13 @@ def getASDM(uid=None):
     else:
         return False
 
-
-
+def getSBType(sbuid=None):
+    schedXML = GetXML(sbuid, 'SchedBlock')
+    if schedXML is not None:
+        sched = minidom.parseString(schedXML)
+        row = sched.getElementsByTagName('prj:ObsUnitControl')
+        sbtype = row[0].getAttribute('arrayRequested')
+    return sbtype
 
 def getMain(uid=None):
     mainXML = GetXML(uid,'Main')
@@ -490,16 +495,29 @@ def getSBFields(sbuid=None):
     rows = sched.getElementsByTagName('sbl:FieldSource')
     fieldList = list()
     for i in rows:
-        fieldList.append((
-            i.getAttribute('entityPartId'),
-            i.getAttribute('solarSystemObject'),
-            i.getElementsByTagName('sbl:sourceName')[0].firstChild.data,
-            #i.getElementsByTagName('sbl:sourceEphemeris')[0].firstChild.data,
-            i.getElementsByTagName('sbl:name')[0].firstChild.data,
-            i.getElementsByTagName('sbl:sourceCoordinates')[0].getElementsByTagName('val:longitude')[0].firstChild.data,
-            i.getElementsByTagName('sbl:sourceCoordinates')[0].getElementsByTagName('val:latitude')[0].firstChild.data,
+        try:
+            print i.getElementsByTagName('sbl:sourceName')[0].firstChild.data
+            fieldList.append((
+                i.getAttribute('entityPartId'),
+                i.getAttribute('solarSystemObject'),
+                i.getElementsByTagName('sbl:sourceName')[0].firstChild.data,
+                #i.getElementsByTagName('sbl:sourceEphemeris')[0].firstChild.data,
+                i.getElementsByTagName('sbl:name')[0].firstChild.data,
+                i.getElementsByTagName('sbl:sourceCoordinates')[0].getElementsByTagName('val:longitude')[0].firstChild.data,
+                i.getElementsByTagName('sbl:sourceCoordinates')[0].getElementsByTagName('val:latitude')[0].firstChild.data,
 
-        ))
+            ))
+        except AttributeError as e:
+            fieldList.append((
+                i.getAttribute('entityPartId'),
+                i.getAttribute('solarSystemObject'),
+                #i.getElementsByTagName('sbl:sourceName')[0].firstChild.data,
+                u"None",
+                #i.getElementsByTagName('sbl:sourceEphemeris')[0].firstChild.data,
+                i.getElementsByTagName('sbl:name')[0].firstChild.data,
+                i.getElementsByTagName('sbl:sourceCoordinates')[0].getElementsByTagName('val:longitude')[0].firstChild.data,
+                i.getElementsByTagName('sbl:sourceCoordinates')[0].getElementsByTagName('val:latitude')[0].firstChild.data,
+            ))
 
     field = pd.DataFrame(fieldList, columns=['entityPartId','solarSystemObject','sourceName','name','longitude','latitude'])
     return field
