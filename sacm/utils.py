@@ -99,9 +99,10 @@ def findChannel(start=None, width=None, repFreq=None, nchan=None):
             else:
                 channel = i
                 break
-
-    return channel
-
+    if channel < 0:
+        return channel + nchan
+    else:
+        return channel
 
 def RadianTo(num=None, unit=None):
     """

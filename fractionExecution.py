@@ -131,7 +131,7 @@ def fractionExecution(request):
     ToSEB = float(subscan['delta'][subscan['onsource'] == True].sum().total_seconds())
 
     ################################
-    target = list(scan[subscan['target'] == True]['sourceName'].unique())
+    target = list(scan[scan['target'] == True]['sourceName'].unique())
     scan['atm'] = scan.apply(lambda x: True if str(x['scanIntent']).find('CALIBRATE_ATMOSPHERE') > 0 and x['sourceName'] in target else False,axis =1 )
 
     ################################
